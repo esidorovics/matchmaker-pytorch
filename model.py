@@ -50,7 +50,7 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
     patience_level = 0
 
     with open(log_file, 'w') as f:
-        f.write(f'Epoch\tTrain Loss\tValidation Loss')
+        f.write(f'Epoch\tTrain Loss\tValidation Loss\n')
     print(f'Epoch\tTrain Loss\tValidation Loss')
 
     for epoch in range(epochs):
@@ -93,7 +93,7 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
             break
 
         with open(log_file, 'a') as f:
-            f.write(f'{epoch}\t{running_loss}\t{val_loss}')
+            f.write(f'{epoch}\t{running_loss}\t{val_loss}\n')
         print(f'{epoch}\t{running_loss}\t{val_loss}')
 
 

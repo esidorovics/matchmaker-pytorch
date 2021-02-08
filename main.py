@@ -7,7 +7,7 @@ import argparse
 import torch
 import pandas as pd
 import performance_metrics
-
+import datetime
 
 def main(args, device):
     os.makedirs('logs', exist_ok=True)
@@ -30,9 +30,11 @@ def main(args, device):
         valid_dataset = MMDataset(cell_line, chem1, chem2, synergies, args.val_ind)
         train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=0)
         valid_loader = DataLoader(valid_dataset, batch_size=128, shuffle=True, num_workers=0)
-
+        start = datetime.datetime.now()
+        print(f'Training starts at {start}')
         train(mm, train_loader, valid_loader, os.path.join('logs', args.train_log), args.epoch, 
               args.patience, args.model_name, device)
+        print(f'Train time {datetime.datetime.now()-start}')
 
     mm.load_state_dict(torch.load(args.model_name))
     mm.eval()

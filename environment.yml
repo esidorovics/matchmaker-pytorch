@@ -1,0 +1,45 @@
+name: mm-pytorch
+channels:
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - astroid=2.4.2=py37_0
+  - ca-certificates=2021.1.19=h06a4308_0
+  - certifi=2020.12.5=py37h06a4308_0
+  - isort=5.7.0=pyhd3eb1b0_0
+  - lazy-object-proxy=1.4.3=py37h27cfd23_2
+  - ld_impl_linux-64=2.33.1=h53a641e_7
+  - libedit=3.1.20191231=h14c3975_1
+  - libffi=3.3=he6710b0_2
+  - libgcc-ng=9.1.0=hdf63c60_0
+  - libstdcxx-ng=9.1.0=hdf63c60_0
+  - mccabe=0.6.1=py37_1
+  - ncurses=6.2=he6710b0_1
+  - openssl=1.1.1i=h27cfd23_0
+  - pip=20.3.3=py37h06a4308_0
+  - pylint=2.6.0=py37_0
+  - python=3.7.9=h7579374_0
+  - readline=8.1=h27cfd23_0
+  - setuptools=52.0.0=py37h06a4308_0
+  - six=1.15.0=py37h06a4308_0
+  - sqlite=3.33.0=h62c20be_0
+  - tk=8.6.10=hbc83047_0
+  - toml=0.10.1=py_0
+  - typed-ast=1.4.2=py37h27cfd23_1
+  - wheel=0.36.2=pyhd3eb1b0_0
+  - wrapt=1.11.2=py37h7b6447c_0
+  - xz=5.2.5=h7b6447c_0
+  - zlib=1.2.11=h7b6447c_3
+  - pip:
+    - joblib==1.0.0
+    - numpy==1.20.0
+    - pandas==1.2.1
+    - python-dateutil==2.8.1
+    - pytz==2021.1
+    - scikit-learn==0.24.1
+    - scipy==1.6.0
+    - sklearn==0.0
+    - threadpoolctl==2.1.0
+    - torch==1.7.1
+    - typing-extensions==3.7.4.3
+prefix: /home/eduards/miniconda3/envs/mm-pytorch

@@ -68,7 +68,7 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
             loss.backward()
             optimizer.step()
             
-            running_loss += loss.item()
+            running_loss += loss.item()*data['chem1'].shape[0]
         with torch.no_grad():
             model.eval()
             val_loss = 0.0
@@ -80,7 +80,7 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
 
                 preds = model(drug1, drug2, cell)
                 loss = criterion(synergy, preds)
-                val_loss += loss.item()
+                val_loss += loss.item()*data['chem1'].shape[0]
             model.train()
         patience_level += 1
         if best_val_loss > val_loss:
@@ -93,8 +93,8 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
             break
 
         with open(log_file, 'a') as f:
-            f.write(f'{epoch}\t{running_loss}\t{val_loss}\n')
-        print(f'{epoch}\t{running_loss}\t{val_loss}')
+            f.write(f'{epoch}\t{running_loss/len(train_loader.dataset)}\t{val_loss/len(valid_loader.dataset)}\n')
+        print(f'{epoch}\t{running_loss/len(train_loader.dataset)}\t{val_loss/len(valid_loader.dataset)}')
 
 
 def predict(model, test_loader, labels, device):

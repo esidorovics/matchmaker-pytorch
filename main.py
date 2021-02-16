@@ -20,16 +20,25 @@ def main(args, device):
     layers['DSN'] = list(map(int, architecture['DSN_1'][0].split('-'))) # layers of Drug Synergy Network 1
     layers['SPN'] = list(map(int, architecture['SPN'][0].split('-'))) # layers of Synergy Prediction Network
 
-    mm = MatchMaker(layers['DSN'], layers['SPN'], chem1.shape[1], cell_line.shape[1], 
-                    args.in_drop, args.dropout)
-    mm.to(device)
+    # mm = MatchMaker(layers['DSN'], layers['SPN'], chem1.shape[1], cell_line.shape[1], 
+    #                 args.in_drop, args.dropout)
+    # mm.to(device)
 
     if args.train_test_mode == 'train':
         #TODO remove features where there is no variation
         train_dataset = MMDataset(cell_line, chem1, chem2, synergies, args.train_ind, train=True)
+        chem_scaler, cell_scaler = train_dataset.normalize()
+        train_dataset.calculate_weight()
         valid_dataset = MMDataset(cell_line, chem1, chem2, synergies, args.val_ind)
+        valid_dataset.normalize(chem_scaler, cell_scaler)
         train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=0)
         valid_loader = DataLoader(valid_dataset, batch_size=128, shuffle=True, num_workers=0)
+
+        drug_dim  = train_dataset.chem1.shape[1]
+        cell_dim = train_dataset.cells.shape[1]
+        mm = MatchMaker(layers['DSN'], layers['SPN'], drug_dim, cell_dim, args.in_drop, args.dropout)
+        mm.to(device)
+
         start = datetime.datetime.now()
         print(f'Training starts at {start}')
         train(mm, train_loader, valid_loader, os.path.join('logs', args.train_log), args.epoch, 
@@ -39,9 +48,10 @@ def main(args, device):
     mm.load_state_dict(torch.load(args.model_name))
     mm.eval()
     test_dataset = MMDataset(cell_line, chem1, chem2, synergies, args.test_ind)
+    test_dataset.normalize(chem_scaler, cell_scaler)
     test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
 
-    all_preds = predict(mm, test_loader, test_dataset.synergies, device)
+    all_preds = predict(mm, test_loader, device)
 
     mse_value = performance_metrics.mse(test_dataset.synergies, all_preds)
     spearman_value = performance_metrics.spearman(test_dataset.synergies, all_preds)

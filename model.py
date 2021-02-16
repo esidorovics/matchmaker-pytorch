@@ -9,7 +9,7 @@ class MatchMaker(nn.Module):
     def __init__(self, dsn_layers, spn_layers, drug_dim, cell_line_dim, in_drop_prob, drop_prob):
         super().__init__()
         dsn_layers.insert(0, drug_dim+cell_line_dim)
-        dsn = [nn.BatchNorm1d(dsn_layers[0])]
+        dsn = []
         for i, size in enumerate(dsn_layers[1:], 1):
             dsn.append(nn.Linear(dsn_layers[i-1], size))
             if i < len(dsn_layers)-1 :
@@ -43,7 +43,7 @@ class MatchMaker(nn.Module):
 
 
 def train(model, train_loader, valid_loader, log_file, epochs, patience, model_name, device):
-    criterion = nn.MSELoss()
+    criterion = nn.MSELoss(reduce=None)
     optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
     best_val_loss = float('inf')
@@ -55,7 +55,7 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
 
     for epoch in range(epochs):
         running_loss = 0.0
-        for data in train_loader:
+        for step, data in enumerate(train_loader, 1):
             optimizer.zero_grad()
 
             drug1 = data['chem1'].to(device)
@@ -64,16 +64,19 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
             synergy = data['synergy'].to(device)
             weights = data['loss_weight'].to(device)
             
-            preds = model(drug1, drug2, cell)*weights
-            loss = criterion(synergy, preds)
+            preds = model(drug1, drug2, cell)
+            loss = criterion(synergy, preds)*weights
+            loss = loss.mean()
             loss.backward()
             optimizer.step()
             
-            running_loss += loss.item()*data['chem1'].shape[0]
+            running_loss += loss.item()
+        running_loss /= step
+        # running_loss /= step
         with torch.no_grad():
             model.eval()
             val_loss = 0.0
-            for data in valid_loader:
+            for step, data in enumerate(valid_loader, 1):
                 drug1 = data['chem1'].to(device)
                 drug2 = data['chem2'].to(device)
                 cell = data['cell'].to(device)
@@ -81,8 +84,9 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
 
                 preds = model(drug1, drug2, cell)
                 loss = criterion(synergy, preds)
-                val_loss += loss.item()*data['chem1'].shape[0]
+                val_loss += loss.mean().item()
             model.train()
+            val_loss /= step
         patience_level += 1
         if best_val_loss > val_loss:
             print('new best Model')
@@ -98,16 +102,14 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
         print(f'{epoch}\t{running_loss/len(train_loader.dataset)}\t{val_loss/len(valid_loader.dataset)}')
 
 
-def predict(model, test_loader, labels, device):
+def predict(model, test_loader, device):
     model.eval()
     all_preds = None
     with torch.no_grad():
-        val_loss = 0.0
         for data in test_loader:
             drug1 = data['chem1'].to(device)
             drug2 = data['chem2'].to(device)
             cell = data['cell'].to(device)
-            synergy = data['synergy'].to(device)
 
             preds = model(drug1, drug2, cell).cpu().numpy()
             if all_preds is None:

@@ -62,8 +62,9 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
             drug2 = data['chem2'].to(device)
             cell = data['cell'].to(device)
             synergy = data['synergy'].to(device)
+            weights = data['loss_weight'].to(device)
             
-            preds = model(drug1, drug2, cell)
+            preds = model(drug1, drug2, cell)*weights
             loss = criterion(synergy, preds)
             loss.backward()
             optimizer.step()

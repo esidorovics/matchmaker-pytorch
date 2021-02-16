@@ -16,13 +16,17 @@ def data_loader(drug1_chemicals, drug2_chemicals, cell_line_gex, comb_data_name)
 class MMDataset(Dataset):
     "MatchMaker Dataset."
 
-    def __init__(self, cell_lines, chem1, chem2, synergies, index_file):
+    def __init__(self, cell_lines, chem1, chem2, synergies, index_file, train=False):
         indices = np.loadtxt(index_file, dtype=np.int)
         self.cells = cell_lines[indices]
         self.chem1 = chem1[indices]
         self.chem2 = chem2[indices]
         self.synergies = synergies[indices]
-    
+        self.train = train
+        if self.train:
+            min_s = np.amin(self.synergies)
+            self.loss_weight = np.log(self.synergies - min_s + np.e)
+            print(min_s)    
 
     def __len__(self):
         return self.cells.shape[0]
@@ -34,5 +38,7 @@ class MMDataset(Dataset):
             'chem2': self.chem2[idx],
             'synergy': self.synergies[idx]
         }
+        if self.train:
+            sample['loss_weight'] = self.loss_weight[idx]
         return sample
 

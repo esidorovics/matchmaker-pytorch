@@ -26,7 +26,7 @@ def main(args, device):
 
     if args.train_test_mode == 'train':
         #TODO remove features where there is no variation
-        train_dataset = MMDataset(cell_line, chem1, chem2, synergies, args.train_ind)
+        train_dataset = MMDataset(cell_line, chem1, chem2, synergies, args.train_ind, train=True)
         valid_dataset = MMDataset(cell_line, chem1, chem2, synergies, args.val_ind)
         train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=0)
         valid_loader = DataLoader(valid_dataset, batch_size=128, shuffle=True, num_workers=0)

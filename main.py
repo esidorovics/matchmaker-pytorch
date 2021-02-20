@@ -37,6 +37,7 @@ def main(args, device):
         drug_dim  = train_dataset.chem1.shape[1]
         cell_dim = train_dataset.cells.shape[1]
         mm = MatchMaker(layers['DSN'], layers['SPN'], drug_dim, cell_dim, args.in_drop, args.dropout)
+        print(mm)
         mm.to(device)
 
         start = datetime.datetime.now()

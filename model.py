@@ -57,7 +57,6 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
         running_loss = 0.0
         for step, data in enumerate(train_loader, 1):
             optimizer.zero_grad()
-
             drug1 = data['chem1'].to(device)
             drug2 = data['chem2'].to(device)
             cell = data['cell'].to(device)
@@ -65,14 +64,15 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
             weights = data['loss_weight'].to(device)
             
             preds = model(drug1, drug2, cell)
+
             loss = criterion(synergy, preds)*weights
-            loss = loss.mean()
+            loss = loss.sum()
             loss.backward()
             optimizer.step()
             
             running_loss += loss.item()
-        running_loss /= step
-        # running_loss /= step
+        running_loss /=step
+
         with torch.no_grad():
             model.eval()
             val_loss = 0.0
@@ -84,9 +84,10 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
 
                 preds = model(drug1, drug2, cell)
                 loss = criterion(synergy, preds)
-                val_loss += loss.mean().item()
+                val_loss += loss.sum().item()
             model.train()
             val_loss /= step
+
         patience_level += 1
         if best_val_loss > val_loss:
             print('new best Model')
@@ -98,8 +99,8 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
             break
 
         with open(log_file, 'a') as f:
-            f.write(f'{epoch}\t{running_loss/len(train_loader.dataset)}\t{val_loss/len(valid_loader.dataset)}\n')
-        print(f'{epoch}\t{running_loss/len(train_loader.dataset)}\t{val_loss/len(valid_loader.dataset)}')
+            f.write(f'{epoch}\t{running_loss:.4f}\t{val_loss:.4f}\n')
+        print(f'{epoch}\t{running_loss:.4f}\t{val_loss:.4f}')
 
 
 def predict(model, test_loader, device):

@@ -3,23 +3,32 @@ from sklearn.metrics import mean_squared_error
 import numpy as np
 
 
-def pearson(y, pred):
+def pearson(y, pred, logger=None):
     pear = stats.pearsonr(y, pred)
     pear_value = pear[0]
     pear_p_val = pear[1]
-    print("Pearson correlation is {} and related p_value is {}".format(pear_value, pear_p_val))
+    if logger is not None:
+        logger("Pearson correlation is {} and related p_value is {}".format(pear_value, pear_p_val))
+    else:
+        print("Pearson correlation is {} and related p_value is {}".format(pear_value, pear_p_val))
     return pear_value
 
-def spearman(y, pred):
+def spearman(y, pred, logger=None):
     spear = stats.spearmanr(y, pred)
     spear_value = spear[0]
     spear_p_val = spear[1]
-    print("Spearman correlation is {} and related p_value is {}".format(spear_value, spear_p_val))
+    if logger is not None:
+        logger("Spearman correlation is {} and related p_value is {}".format(spear_value, spear_p_val))
+    else:
+        print("Spearman correlation is {} and related p_value is {}".format(spear_value, spear_p_val))
     return spear_value
 
-def mse(y, pred):
+def mse(y, pred, logger = None):
     err = mean_squared_error(y, pred)
-    print("Mean squared error is {}".format(err))
+    if logger is not None:
+        logger("Mean squared error is {}".format(err))
+    else:
+        print("Mean squared error is {}".format(err))
     return err
 
 def squared_error(y,pred):

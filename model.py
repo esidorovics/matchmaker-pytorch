@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch
 import numpy as np
-
+import os
 
 class MatchMaker(nn.Module):
     
@@ -42,16 +42,19 @@ class MatchMaker(nn.Module):
         return out.flatten()
 
 
-def train(model, train_loader, valid_loader, log_file, epochs, patience, model_name, device):
+
+
+def train(model, train_loader, valid_loader, logger, epochs, patience, model_name, save_dir, device):
+    if logger is not None:
+        debug, info = logger.debug, logger.info
+
     criterion = nn.MSELoss(reduce=None)
     optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
     best_val_loss = float('inf')
     patience_level = 0
 
-    with open(log_file, 'w') as f:
-        f.write(f'Epoch\tTrain Loss\tValidation Loss\n')
-    print(f'Epoch\tTrain Loss\tValidation Loss')
+    debug('Epoch\tTrain Loss\tValidation Loss')
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -90,17 +93,15 @@ def train(model, train_loader, valid_loader, log_file, epochs, patience, model_n
 
         patience_level += 1
         if best_val_loss > val_loss:
-            print('new best Model')
             best_val_loss = val_loss
-            torch.save(model.state_dict(), model_name)
+            torch.save(model.state_dict(), os.path.join(save_dir, model_name))
             patience_level = 0
 
         if patience_level > patience:
             break
 
-        with open(log_file, 'a') as f:
-            f.write(f'{epoch}\t{running_loss:.4f}\t{val_loss:.4f}\n')
-        print(f'{epoch}\t{running_loss:.4f}\t{val_loss:.4f}')
+        debug(f'{epoch}\t{running_loss:.4f}\t{val_loss:.4f}')
+    debug(f'Train stopped, Best validation loss {best_val_loss}')
 
 
 def predict(model, test_loader, device):

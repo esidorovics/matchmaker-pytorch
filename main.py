@@ -109,28 +109,28 @@ torch.manual_seed(0)
 
 parser = argparse.ArgumentParser(description='REQUEST REQUIRED PARAMETERS OF MatchMaker')
 
-parser.add_argument('--comb-data-name', default='data/small_DrugCombinationData.tsv',
+parser.add_argument('--comb-data-name', default='data/DrugCombinationData.tsv',
                     help="Name of the drug combination data")
 
-parser.add_argument('--cell_line-gex', default='data/small_cell_line_gex.csv',
+parser.add_argument('--cell_line-gex', default='data/cell_line_gex.csv',
                     help="Name of the cell line gene expression data")
 
-parser.add_argument('--drug1-chemicals', default='data/small_drug1_chem.csv',
+parser.add_argument('--drug1-chemicals', default='data/drug1_chem.csv',
                     help="Name of the chemical features data for drug 1")
 
-parser.add_argument('--drug2-chemicals', default='data/small_drug2_chem.csv',
+parser.add_argument('--drug2-chemicals', default='data/drug2_chem.csv',
                     help="Name of the chemical features data for drug 2")
 
 parser.add_argument('--train-test-mode', default='train', type = str,
                     help="Test or train mode (test/train)")
 
-parser.add_argument('--train-ind', default='data/small_train_inds.txt',
+parser.add_argument('--train-ind', default='data/train_inds.txt',
                     help="Data indices that will be used for training")
 
-parser.add_argument('--val-ind', default='data/small_val_inds.txt',
+parser.add_argument('--val-ind', default='data/val_inds.txt',
                     help="Data indices that will be used for validation")
 
-parser.add_argument('--test-ind', default='data/small_test_inds.txt',
+parser.add_argument('--test-ind', default='data/test_inds.txt',
                     help="Data indices that will be used for test")
 
 parser.add_argument('--model_name', default="matchmaker.pt",

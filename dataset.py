@@ -10,6 +10,8 @@ def data_loader(drug1_chemicals, drug2_chemicals, cell_line_gex, comb_data_name)
     cell_line = np.loadtxt(cell_line_gex, delimiter=',', dtype=np.float32)
     chem1 = np.loadtxt(drug1_chemicals, delimiter=',', dtype=np.float32)
     chem2 = np.loadtxt(drug2_chemicals, delimiter=',', dtype=np.float32)
+    chem1 = np.nan_to_num(chem1)
+    chem2 = np.nan_to_num(chem2)
     return chem1, chem2, cell_line, synergies
 
 

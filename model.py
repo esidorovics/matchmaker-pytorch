@@ -37,7 +37,12 @@ class MatchMaker(nn.Module):
         x2 = torch.cat((drug2, cell), 1)
         embedding1 = self.dsn(x1)
         embedding2 = self.dsn(x2)
-        combination = torch.cat((embedding1, embedding2), 1)
+        # combination = torch.cat((embedding1, embedding2), 1)
+        if torch.rand(1)[0] < 0.5:
+            combination = torch.cat((embedding1, embedding2), 1)
+        else:
+            combination = torch.cat((embedding2, embedding1), 1)
+
         out = self.spn(combination)
         return out.flatten()
 
@@ -68,8 +73,9 @@ def train(model, train_loader, valid_loader, logger, epochs, patience, model_nam
             
             preds = model(drug1, drug2, cell)
 
-            loss = criterion(synergy, preds)*weights
-            loss = loss.sum()
+            loss = criterion(synergy, preds)
+            running_loss += loss.mean().item()
+            loss = (loss*weights).mean()
             loss.backward()
             optimizer.step()
             

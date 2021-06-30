@@ -52,6 +52,13 @@ def main(args, device):
 
     chem1, chem2, cell_line, synergies = data_loader(args.drug1_chemicals, args.drug2_chemicals,
                                                     args.cell_line_gex, args.comb_data_name)
+    print(chem1.shape)
+    print(chem1.max())
+    print(chem1.min())
+    print(chem2.shape)
+    print(chem2.max())
+    print(chem2.min())
+    print(cell_line.shape)
 
     architecture = pd.read_csv('architecture.txt')
     layers = {}
@@ -99,6 +106,10 @@ def main(args, device):
     spearman_value = performance_metrics.spearman(test_dataset.synergies, all_preds, debug)
     pearson_value = performance_metrics.pearson(test_dataset.synergies, all_preds, debug)
 
+    df = pd.DataFrame()
+    df['preds'] = all_preds
+    df['loewe'] = test_dataset.synergies
+    df.to_csv(os.path.join(args.save_dir, 'mm-pytorch-preds.csv'), index=False)
     info(f"Pearson correlation: {pearson_value}")
     info(f"Spearman correlation: {spearman_value}")
     info(f"Mean squared error: {mse_value}")
@@ -109,28 +120,28 @@ torch.manual_seed(0)
 
 parser = argparse.ArgumentParser(description='REQUEST REQUIRED PARAMETERS OF MatchMaker')
 
-parser.add_argument('--comb-data-name', default='data/DrugCombinationData.tsv',
+parser.add_argument('--comb-data-name', default='../matchmaker/data/v15/DrugCombinationData.tsv',
                     help="Name of the drug combination data")
 
-parser.add_argument('--cell_line-gex', default='data/cell_line_gex.csv',
+parser.add_argument('--cell_line-gex', default='../matchmaker/data/v15/cell_line_gex.csv',
                     help="Name of the cell line gene expression data")
 
-parser.add_argument('--drug1-chemicals', default='data/drug1_chem.csv',
+parser.add_argument('--drug1-chemicals', default='../matchmaker/data/v15/drug1_chem_v15.csv',
                     help="Name of the chemical features data for drug 1")
 
-parser.add_argument('--drug2-chemicals', default='data/drug2_chem.csv',
+parser.add_argument('--drug2-chemicals', default='../matchmaker/data/v15/drug2_chem_v15.csv',
                     help="Name of the chemical features data for drug 2")
 
 parser.add_argument('--train-test-mode', default='train', type = str,
                     help="Test or train mode (test/train)")
 
-parser.add_argument('--train-ind', default='data/train_inds.txt',
+parser.add_argument('--train-ind', default='../matchmaker/data/v15/train_inds.txt',
                     help="Data indices that will be used for training")
 
-parser.add_argument('--val-ind', default='data/val_inds.txt',
+parser.add_argument('--val-ind', default='../matchmaker/data/v15/val_inds.txt',
                     help="Data indices that will be used for validation")
 
-parser.add_argument('--test-ind', default='data/test_inds.txt',
+parser.add_argument('--test-ind', default='../matchmaker/data/v15/test_inds.txt',
                     help="Data indices that will be used for test")
 
 parser.add_argument('--model_name', default="matchmaker.pt",
